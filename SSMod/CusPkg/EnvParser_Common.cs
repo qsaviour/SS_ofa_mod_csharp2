@@ -8,6 +8,7 @@ using UAssetAPI.PropertyTypes.Objects;
 using UAssetAPI.PropertyTypes.Structs;
 using UAssetAPI.UnrealTypes;
 using UAssetAPI;
+using Newtonsoft.Json.Linq;
 
 namespace SSMod.CusPkg
 {
@@ -17,164 +18,66 @@ namespace SSMod.CusPkg
             "LS_Sng026_Common_Env.uasset",
         };
 
-        public UAsset parse_a_file(string source_file)
+
+        public void parse(string source_folder, string target_folder, JObject json_obj)
         {
-            UAsset myAsset = new UAsset(source_file, EngineVersion.VER_UE4_24);
-            var exports = myAsset.Exports;
-            var main_export = (NormalExport)exports[0];
-            var datas = main_export.Data;
-            var scence_ind = ((ObjectPropertyData)datas[0]).Value.Index;
-            var scence = (NormalExport)exports[scence_ind - 1];
-            var scence_data = scence.Data;
-            var object_bindings = (ArrayPropertyData)scence_data[1];
-            foreach (StructPropertyData obj_binding in object_bindings.Value)
-            {
-                var v1 = (StrPropertyData)obj_binding.Value[1];
-                string name = v1.ToString();
-                if (name == "PostProcessVolume")
-                {
-                    // PostProcessVolume(obj_binding, ref exports, ref myAsset); 
-                }
-
-                else if (name == "ToonGlobalSettings") { }
-                else if (name == "CharaLightTargetA") { }
-                else if (name == "CharaLightTargetB") { }
-                else if (name == "CharaLightTargetC") { }
-                else if (name == "CharaLightTargetD") { }
-                else if (name == "CharaLightTargetE") { }
-                else if (name == "BP_LLGroup_Center") { }
-                else if (name == "SharedBackScreenMonitorSettings1") { }
-                else if (name == "BP_LiveDecalCircleActor") { }
-                else if (name == "BP_LiveDecalCircleActor_01SOLO") { }
-                else if (name == "BP_LiveDecalCircleActor_02DUO") { }
-                else if (name == "BP_FoliageAudienceController") { }
-
-                else if (name == "BP_LL_PinSpotA") { }
-                else if (name == "BP_LL_PinSpotB") { }
-                else if (name == "BP_LL_PinSpotC") { }
-                else if (name == "BP_LL_PinSpotD") { }
-                else if (name == "BP_LL_PinSpotE") { }
-
-                else if (name == "BP_IMAL_Sky_ConstellationSphere_CloudySky") { }
-
-            }
-
-
-            return myAsset;
-        }
-
-        public void parse(string source_folder, string target_folder)
-        {
+            ParseTool parse_tool = new ParseTool();
             foreach (var ufile in ufiles)
             {
-                Console.WriteLine("Processsing:" + ufile);
+                //Console.WriteLine("Processsing:" + ufile);
                 var source_file = source_folder + "\\" + ufile;
                 var target_file = target_folder + "\\" + ufile;
 
-                var res_asset = parse_a_file(source_file);
+                var myAsset = new UAsset(source_file, EngineVersion.VER_UE4_24);
 
-                res_asset.Write(target_file);
-                Console.WriteLine("Write target_file:" + target_file);
+                process_PinSpot(ref myAsset, json_obj);
+                myAsset.Write(target_file);
+                Console.WriteLine($"Write to {target_file}!");
             }
         }
 
-        void PostProcessVolume(StructPropertyData d, ref List<Export> exports, ref UAsset myAsset)
+        void process_PinSpot(ref UAsset myAsset, JObject json_obj)
         {
-            void parse_color() { }
-            var tracks = (ArrayPropertyData)d.Value[2];
-            foreach (ObjectPropertyData track in tracks.Value)
+            var stage_colors = json_obj["stage_color"];
+            List<float> frames = new List<float>() {};
+            List<float> reds = new List<float>() {};
+            List<float> greens = new List<float>() {};
+            List<float> blues = new List<float>() {};
+            List<bool> is_fades = new List<bool>() {};
+            foreach(var stage_color in stage_colors)
             {
-                int track_ind = int.Parse(track.ToString());
-                var export = (NormalExport)exports[track_ind - 1];
-                var data = (List<PropertyData>)export.Data;
-                string name = data[1].ToString();
-
-                if (name == "ColorGain" && false)
-                {
-                    var sub_track_ref = (ArrayPropertyData)data[3];
-                    var sub_track_ind = int.Parse(((ObjectPropertyData)sub_track_ref.Value[0]).Value.ToString());
-                    var sub_track = (NormalExport)exports[sub_track_ind - 1];
-                    var x = (StructPropertyData)sub_track.Data[0];
-                    var y = (StructPropertyData)sub_track.Data[1];
-                    var z = (StructPropertyData)sub_track.Data[2];
-                    var w = (StructPropertyData)sub_track.Data[3];
-
-                    foreach (var l in new StructPropertyData[] { x, y, z })
+                float frame = (float)stage_color["frame"];
+                float red = float.Parse(stage_color["color"][0].ToString());
+                float green = float.Parse(stage_color["color"][1].ToString());
+                float blue = float.Parse(stage_color["color"][2].ToString());
+                bool is_fade = (bool)stage_color["is_fade"];
+                frames.Add(frame);
+                reds.Add(red);
+                greens.Add(green);
+                blues.Add(blue); 
+                is_fades.Add(is_fade);
+            }
+            ParseTool parse_tool = new ParseTool();
+            var layer1s = parse_tool.get_layer1_tracks(ref myAsset);
+            List<string> to_edit_names = new List<string>() { "BP_LL_PinSpotA", "BP_LL_PinSpotB", "BP_LL_PinSpotC", "BP_LL_PinSpotD", "BP_LL_PinSpotE", "BP_LLGroup_Center", };
+            foreach (var layer1 in layer1s)
+            {
+                var name = layer1.Item1;
+                
+                if (to_edit_names.Contains(name)) {
+                    //Console.WriteLine($"Is Writing :{name} .......");
+                    var curve_name_main = "_Color";
+                    var layer2_exports = parse_tool.get_scalar_layer2_exports(ref myAsset, layer1.Item1, layer1.Item2, curve_name_main);
+                    foreach(var layer2_export in layer2_exports)
                     {
-                        var times_stack = (ArrayPropertyData)l.Value[0];
-                        var values_stack = (ArrayPropertyData)l.Value[1];
+                        var red_curve = parse_tool.get_scalar_layer2_curves(name, curve_name_main, layer2_export, "RedCurve");
+                        var green_curve = parse_tool.get_scalar_layer2_curves(name, curve_name_main, layer2_export, "GreenCurve");
+                        var blue_curve = parse_tool.get_scalar_layer2_curves(name, curve_name_main, layer2_export, "BlueCurve");
 
-                        //var times = times_stack.Value;
-                        //var values = values_stack.Value;
-
-                        List<PropertyData> times_stack_tmp_list = new List<PropertyData>();
-                        List<PropertyData> values_stack_tmp_list = new List<PropertyData>();
-                        for (int i = 0; i < 500; i++)
-                        {
-                            int time = i * 400 * 30;
-                            int value = (i % 2);
-
-                            StructPropertyData time_struct = new StructPropertyData(new FName(myAsset, "Times"));
-                            time_struct.StructType = new FName(myAsset, "FrameNumber");
-
-                            FrameNumberPropertyData frame_time = new FrameNumberPropertyData(new FName(myAsset, "Times"));
-                            frame_time.Value = new FFrameNumber(time);
-
-                            time_struct.Value.Add(frame_time);
-                            times_stack_tmp_list.Add(time_struct);
-
-
-                            StructPropertyData value_stuct = new StructPropertyData(new FName(myAsset, "Values"));
-                            value_stuct.StructType = new FName(myAsset, "MovieSceneFloatValue");
-                            MovieSceneFloatValuePropertyData value_time = new MovieSceneFloatValuePropertyData(new FName(myAsset, "Values"));
-                            //value_time.Value = new FMovieSceneFloatValue();
-                            //value_time.Value.Value = value;
-                            //value_time.Value.Tangent = new FMovieSceneTangentData();
-                            //value_time.Value.padding = new byte[0];
-                            //value_time.Value.Tangent.padding = new byte[0];
-
-                            value_stuct.Value.Add(value_time);
-                            values_stack_tmp_list.Add(value_stuct);
-
-                        }
-
-                        PropertyData[] time_tmp_array = new PropertyData[times_stack_tmp_list.Count];
-                        PropertyData[] value_tmp_array = new PropertyData[times_stack_tmp_list.Count];
-
-                        for (int i = 0; i < times_stack_tmp_list.Count; i++)
-                        {
-                            time_tmp_array[i] = times_stack_tmp_list[i];
-                            value_tmp_array[i] = values_stack_tmp_list[i];
-                        }
-
-                        times_stack.Value = time_tmp_array;
-                        values_stack.Value = value_tmp_array;
+                        parse_tool.set_scalar_layer2_curve_values(ref myAsset, red_curve[0], frames, reds, is_fades);
+                        parse_tool.set_scalar_layer2_curve_values(ref myAsset, green_curve[0], frames, greens, is_fades);
+                        parse_tool.set_scalar_layer2_curve_values(ref myAsset, blue_curve[0], frames, blues, is_fades);
                     }
-
-                }
-                else if (name == "ColorContrast")
-                {
-
-                }
-                else if (name == "Settings.AutoExposureMinBrightness")
-                {
-
-                }
-                else if (name == "Settings.AutoExposureMaxBrightness")
-                {
-
-                }
-                else if (name == "Settings.LensFlareIntensity")
-                {
-
-                }
-                else if (name == "Settings.LensFlareBokehSize")
-                {
-
-                }
-                else if (name == "Settings.LensFlareThreshold")
-                {
-
                 }
             }
         }

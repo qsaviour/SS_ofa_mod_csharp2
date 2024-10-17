@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using UAssetAPI.ExportTypes;
 using UAssetAPI.UnrealTypes;
 using UAssetAPI;
+using Newtonsoft.Json.Linq;
 
 namespace SSMod.CusPkg
 {
@@ -32,7 +33,7 @@ namespace SSMod.CusPkg
             "LS_Sng026_Stg313_Cutoff.uasset",
         };
 
-        public UAsset parse_a_file(string source_file)
+        public UAsset parse_a_file(string source_file, JObject json_obj)
         {
             UAsset myAsset = new UAsset(source_file, EngineVersion.VER_UE4_24);
             var exports = myAsset.Exports;
@@ -41,7 +42,7 @@ namespace SSMod.CusPkg
             return myAsset;
         }
 
-        public void parse(string source_folder, string target_folder)
+        public void parse(string source_folder, string target_folder, JObject json_obj)
         {
             foreach (var ufile in ufiles)
             {
@@ -49,7 +50,7 @@ namespace SSMod.CusPkg
                 var source_file = source_folder + "\\" + ufile;
                 var target_file = target_folder + "\\" + ufile;
 
-                var res_asset = parse_a_file(source_file);
+                var res_asset = parse_a_file(source_file, json_obj);
 
                 res_asset.Write(target_file);
                 Console.WriteLine("Write target_file:" + target_file);
