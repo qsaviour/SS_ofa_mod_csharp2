@@ -104,7 +104,7 @@ namespace SSMod.CusPkg
             return results;
         }
 
-        public List<NormalExport> get_scalar_layer2_exports(ref UAsset myAsset,string layer1_name,StructPropertyData layer1,string layer2_name,string section_name = "Sections",bool use_value=true)
+        public List<NormalExport> get_scalar_layer2_exports(ref UAsset myAsset,string layer1_name,StructPropertyData layer1,string layer2_name,string section_name = "Sections",bool use_value=true,string export_name=null)
         {   
             var exports = (List<Export>)myAsset.Exports;
             var layer2_tracks_ind1 = layer1.Value.Find((e) => { return e.Name.ToString() == "Tracks"; });
@@ -132,7 +132,14 @@ namespace SSMod.CusPkg
                     var layer2_track_ind2_export_ind2_ = (ObjectPropertyData)layer2_track_ind2_export_ind2;
                     var layer2_track_ind = layer2_track_ind2_export_ind2_.Value.Index;
                     var layer2_export = (NormalExport)exports[layer2_track_ind - 1];
-                    results.Add(layer2_export);
+                    if(export_name!=null && !layer2_export.ObjectName.ToString().Contains(export_name))
+                    {
+
+                    }
+                    else
+                    {
+                        results.Add(layer2_export);
+                    }
                 }
             }
             if (results.Count <= 0)
@@ -141,7 +148,6 @@ namespace SSMod.CusPkg
             }
             return results;
         }
-
 
 
         public List<string> get_layer2_curve_names(string layer1_name, string layer2_name, NormalExport layer2)
@@ -155,16 +161,24 @@ namespace SSMod.CusPkg
             return results;
         }
 
-        public List<PropertyData> get_scalar_layer2_curves(string layer1_name,string layer2_name,NormalExport layer2, string curve_name)
+        public PropertyData get_scalar_layer2_curve(NormalExport layer2, string curve_name)
         {
             
-            //Console.WriteLine($"find <layer2>-{layer2_name} from <layer1>-{layer1_name}");
             var layer2_datas = (List<PropertyData>)layer2.Data;
-            var curves = layer2_datas.FindAll((e) => { return e.Name.ToString() == curve_name; });
-            return curves;
+            var curve = layer2_datas.FindAll((e) => { return e.Name.ToString() == curve_name; })[0];
+            return curve;
         }
 
-        public void set_scalar_layer2_curve_values(ref UAsset myAsset,PropertyData curve_,List<float> frames,List<float> values,List<bool> is_fades)
+        public PropertyData get_scalar_layer3_curve(NormalExport layer2, string curve1_name,string curve2_name)
+        {
+            var layer2_datas = (List<PropertyData>)layer2.Data;
+            var curve1 = layer2_datas.FindAll((e) => { return e.Name.ToString() == curve1_name; })[0];
+            var curve1_ = (StructPropertyData)curve1;
+            var curve2 = curve1_.Value.Find((e) => { return e.Name.ToString() == curve2_name; });
+            return curve2;
+        }
+
+        public void set_scalar_layer2_curve_float_values(ref UAsset myAsset,PropertyData curve_,List<float> frames,List<float> values,List<bool> is_fades,float off_value=0)
         {
             var curve = (StructPropertyData)curve_;
             ArrayPropertyData times_curve = null;
@@ -180,7 +194,6 @@ namespace SSMod.CusPkg
             }
             PropertyData[] frames_stack = new PropertyData[frames.Count];
             PropertyData[] values_stack = new PropertyData[values.Count];
-            Random random = new Random();
 
             for(int i=0;i<frames.Count; i++)
             {
@@ -196,11 +209,10 @@ namespace SSMod.CusPkg
                 value_stuct.StructType = new FName(myAsset, "MovieSceneFloatValue");
                 MovieSceneFloatValuePropertyData value_time = new MovieSceneFloatValuePropertyData(new FName(myAsset, "Values"));
                 value_time.Value = new FMovieSceneFloatValue();
-                value_time.Value.Value = values[i];
+                value_time.Value.Value = values[i]+ off_value;
 
-                //value_time.Value.Value = (float)random.NextDouble();
                 value_time.Value.Tangent = new FMovieSceneTangentData();
-                if (is_fades[i])
+                if (is_fades!=null && is_fades[i])
                 {
                     value_time.Value.InterpMode = ERichCurveInterpMode.RCIM_Cubic;
                 }
@@ -208,13 +220,44 @@ namespace SSMod.CusPkg
                 {
                     value_time.Value.InterpMode = ERichCurveInterpMode.RCIM_Constant;
                 }
-                //value_time.Value.padding = new byte[0];
-                //value_time.Value.Tangent.padding = new byte[0];
                 value_stuct.Value.Add(value_time);
                 values_stack[i] = value_stuct;
             }
-            //times_curve.Value = [];
-            //values_curve.Value = [];
+            times_curve.Value = frames_stack;
+            values_curve.Value = values_stack;
+        }
+
+        public void set_scalar_layer2_curve_boolean_values(ref UAsset myAsset, PropertyData curve_, List<float> frames, List<bool> values)
+        {
+            var curve = (StructPropertyData)curve_;
+            ArrayPropertyData times_curve = null;
+            ArrayPropertyData values_curve = null;
+            foreach (var sub_curve in curve.Value)
+            {
+                if (sub_curve.Name.ToString() == "Times") { times_curve = (ArrayPropertyData)sub_curve; }
+                if (sub_curve.Name.ToString() == "Values") { values_curve = (ArrayPropertyData)sub_curve; }
+            }
+            if (times_curve == null || values_curve == null)
+            {
+                Console.WriteLine($"Write Curve Failed!");
+            }
+            PropertyData[] frames_stack = new PropertyData[frames.Count];
+            PropertyData[] values_stack = new PropertyData[values.Count];
+
+            for (int i = 0; i < frames.Count; i++)
+            {
+                StructPropertyData time_struct = new StructPropertyData(new FName(myAsset, "Times"));
+                time_struct.StructType = new FName(myAsset, "FrameNumber");
+
+                FrameNumberPropertyData frame_time = new FrameNumberPropertyData(new FName(myAsset, "Times"));
+                frame_time.Value = new FFrameNumber((int)frames[i] * 400);
+                time_struct.Value.Add(frame_time);
+                frames_stack[i] = time_struct;
+
+                BoolPropertyData value_stuct = new BoolPropertyData();
+                value_stuct.Value = values[i];
+                values_stack[i] = value_stuct;
+            }
             times_curve.Value = frames_stack;
             values_curve.Value = values_stack;
         }

@@ -51,7 +51,7 @@ namespace SSMod.CusPkg
                             {
                                 //Console.WriteLine($"\t\t{e}");
                             }
-                            var rr = parse_tool.get_scalar_layer2_curves(layer1.Item1, layer2_export.ObjectName.ToString(), layer2_export, "ParticleKeys");
+                            var rr = parse_tool.get_scalar_layer2_curve(layer2_export, "ParticleKeys");
                          }
                     }
                 }

@@ -24,7 +24,7 @@ int row_num = table_info.Data.Count();
 List<StructPropertyData> datas = table_info.Data;
 datas.Clear();
 
-string ofa_string = File.ReadAllText("E:\\IMModels\\ModProject\\Dance\\Song_ful\\cache\\lyrics\\lyrics.json");
+string ofa_string = File.ReadAllText("E:\\IMModels\\ModProject\\Dance\\Song_Cng\\cache\\lyrics\\lyrics.json");
 JArray ofa_lyrics = (JArray)JsonConvert.DeserializeObject(ofa_string);
 for (int i = 0; i < ofa_lyrics.Count(); i++)
 {
@@ -63,7 +63,7 @@ for (int i = 0; i < ofa_lyrics.Count(); i++)
 //ff.Value.Add(d2);
 
 //table_info.Data.Add(ff);
-string target_folder = "E:\\IMModels\\ModProject\\Dance\\Song_ful\\output\\MD\\Live\\Lyric\\MD_Lyric_Sng026.uasset";
+string target_folder = "E:\\IMModels\\ModProject\\Dance\\Song_Cng\\output\\MD\\Live\\Lyric\\MD_Lyric_Sng026.uasset";
 myAsset.Write(target_folder);
 
 Console.WriteLine($"Finished! Write to {target_folder}");
