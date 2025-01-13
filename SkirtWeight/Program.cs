@@ -5,14 +5,14 @@ using UAssetAPI.PropertyTypes.Structs;
 using UAssetAPI.UnrealTypes;
 
 
-var MASS = 0.15f; // <0.6
-var ForceGravityStartRotationDegree = 15f; //  >2
-var CentrifugalForcePower = 8f; // >1.5
-var ForceGravityRotationLowerRate_mul = 0.5f; // not unique
+var MASS = 0.10f; // <0.6   0.15f
+var ForceGravityStartRotationDegree = 25f; //  >2  15f;
+var CentrifugalForcePower = 4f; // >1.5  8f
+var ForceGravityRotationLowerRate_mul = 0.5f; // not unique  0.5f
 
-UAsset myAsset = new UAsset("E:\\IMModels\\ModProject\\Dance\\Scripts\\cache\\skirt_weight\\GPA_chr_body_cos021_a_01.uasset", EngineVersion.VER_UE4_24);
+UAsset myAsset = new UAsset("F:\\IMModels\\ModProject\\Cloth\\cheerleader\\cheerleader\\Saved\\Cooked\\GPA_chr_body_cos021_a_01.uasset", EngineVersion.VER_UE4_24);
 //string target_file = "E:\\IMModels\\ModProject\\naked_shirt\\naked_shirt\\Saved\\Cooked\\WindowsNoEditor\\naked_shirt\\StarlitSeason\\Content\\Model\\Character\\Body\\Cos\\chr_body_cos021\\Mesh\\GPA_chr_body_cos021_a_01.uasset";
-string target_file = "E:\\IMModels\\ModProject\\naked_shirt\\naked_shirt\\Saved\\Cooked\\GPA_chr_body_cos021_a_01.uasset";
+string target_file = "F:\\IMModels\\ModProject\\Cloth\\cheerleader\\cheerleader\\Saved\\Cooked\\GPA_chr_body_cos021_a_01.uasset";
 
 
 

@@ -73,7 +73,7 @@ namespace SSMod.CusPkg
                 var name = layer1.Item1;
                 
                 if (BP_PinSpotLights.Contains(name)) {
-                    //Console.WriteLine($"Is Writing :{name} .......");
+                    Console.WriteLine($"Is modifing :{name} .......{myAsset.FilePath}");
                     var curve_name_main = "_Color";
                     var layer2_exports = parse_tool.get_scalar_layer2_exports(ref myAsset, layer1.Item1, layer1.Item2, curve_name_main);
                     foreach(var layer2_export in layer2_exports)
@@ -81,25 +81,25 @@ namespace SSMod.CusPkg
                         var red_curve = parse_tool.get_scalar_layer2_curve(layer2_export, "RedCurve");
                         var green_curve = parse_tool.get_scalar_layer2_curve(layer2_export, "GreenCurve");
                         var blue_curve = parse_tool.get_scalar_layer2_curve(layer2_export, "BlueCurve");
+                        var alpha_curve = parse_tool.get_scalar_layer2_curve(layer2_export, "AlphaCurve");
 
                         parse_tool.set_scalar_layer2_curve_float_values(ref myAsset, red_curve, frames, reds, is_fades);
                         parse_tool.set_scalar_layer2_curve_float_values(ref myAsset, green_curve, frames, greens, is_fades);
                         parse_tool.set_scalar_layer2_curve_float_values(ref myAsset, blue_curve, frames, blues, is_fades);
+                        parse_tool.set_scalar_layer2_curve_float_values(ref myAsset, alpha_curve, frames, individuallyRatios, is_fades);
                     }
 
-                    var layer2_spot_exports = parse_tool.get_scalar_layer2_exports(ref myAsset, layer1.Item1, layer1.Item2, "Sections", use_value:false,export_name:"LiveSpotLightColorSection");
-                    foreach(var layer2_export in layer2_spot_exports)
+                    var layer2_spot_exports = parse_tool.get_scalar_layer2_exports(ref myAsset, layer1.Item1, layer1.Item2, "Sections", use_value: false, export_name: "LiveSpotLightColorSection");
+                    foreach (var layer2_export in layer2_spot_exports)
                     {
                         var blink_curve = parse_tool.get_scalar_layer3_curve(layer2_export, "ChannelsSpot", "Blink");
-                        if(blink_curve!=null)
+                        if (blink_curve != null)
                             parse_tool.set_scalar_layer2_curve_boolean_values(ref myAsset, blink_curve, new List<float>() { -180f }, new List<bool>() { false });
 
                         var intensity_rate_curve = parse_tool.get_scalar_layer3_curve(layer2_export, "ChannelsSpot", "IntensityRate");
                         if (intensity_rate_curve != null)
                         {
-                            float light_off = 3f;
-                            if (name == "BP_LLGroup_Center") light_off = 0;
-                            parse_tool.set_scalar_layer2_curve_float_values(ref myAsset, intensity_rate_curve, frames, brightnesses, is_fades, light_off) ;
+                            parse_tool.set_scalar_layer2_curve_float_values(ref myAsset, intensity_rate_curve, frames, brightnesses, is_fades);
                         }
                     }
                 }
@@ -110,6 +110,7 @@ namespace SSMod.CusPkg
                 var name = layer1.Item1;
                 if (ToonGlobalSettings.Contains(name))
                 {
+                    Console.WriteLine($"Is modifing :{name} .......{myAsset.FilePath}");
                     var layer2_exports = parse_tool.get_scalar_layer2_exports(ref myAsset, layer1.Item1, layer1.Item2, "individuallyRatio");
                     foreach(var layer2_export in layer2_exports)
                     {
@@ -125,6 +126,7 @@ namespace SSMod.CusPkg
                 var name = layer1.Item1;
                 if (Brightness.Contains(name))
                 {
+                    Console.WriteLine($"Is modifing :{name} .......{myAsset.FilePath}");
                     foreach (var adjust_name_ratio in new List<Tuple<string, float>> {
                         new Tuple<string,float>("AutoExposureMaxBrightness", 1f),new Tuple<string,float>("AutoExposureMinBrightness", 1f),
                     })

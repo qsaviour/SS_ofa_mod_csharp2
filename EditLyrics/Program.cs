@@ -15,8 +15,16 @@ using Newtonsoft.Json.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml.Linq;
 
+string name = "fut";
+string ofa_string = File.ReadAllText($"F:\\IMModels\\ModProject\\Dance\\Song_{name}\\cache\\lyrics\\lyrics.json");
 
-UAsset myAsset = new UAsset("E:\\IMModels\\ModProject\\Dance\\Scripts\\cache\\lyrics\\MD_Lyric_Sng026.uasset", EngineVersion.VER_UE4_24);
+string target_folder = $"F:\\IMModels\\ModProject\\Dance\\Song_{name}\\output\\MD\\Live\\Lyric\\";
+Directory.CreateDirectory(target_folder);
+    
+string target_file = target_folder+"\\MD_Lyric_Sng026.uasset";
+
+UAsset myAsset = new UAsset("F:\\IMModels\\ModProject\\Dance\\Scripts\\cache\\lyrics\\MD_Lyric_Sng026.uasset", EngineVersion.VER_UE4_24);
+
 DataTableExport lyric_export = (DataTableExport)myAsset.Exports[0];
 var table_info = lyric_export.Table;
 int row_num = table_info.Data.Count();
@@ -24,7 +32,7 @@ int row_num = table_info.Data.Count();
 List<StructPropertyData> datas = table_info.Data;
 datas.Clear();
 
-string ofa_string = File.ReadAllText("E:\\IMModels\\ModProject\\Dance\\Song_Cng\\cache\\lyrics\\lyrics.json");
+
 JArray ofa_lyrics = (JArray)JsonConvert.DeserializeObject(ofa_string);
 for (int i = 0; i < ofa_lyrics.Count(); i++)
 {
@@ -63,7 +71,6 @@ for (int i = 0; i < ofa_lyrics.Count(); i++)
 //ff.Value.Add(d2);
 
 //table_info.Data.Add(ff);
-string target_folder = "E:\\IMModels\\ModProject\\Dance\\Song_Cng\\output\\MD\\Live\\Lyric\\MD_Lyric_Sng026.uasset";
-myAsset.Write(target_folder);
+myAsset.Write(target_file);
 
 Console.WriteLine($"Finished! Write to {target_folder}");

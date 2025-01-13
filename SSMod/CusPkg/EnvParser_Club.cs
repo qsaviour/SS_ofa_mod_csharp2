@@ -21,6 +21,43 @@ namespace SSMod.CusPkg
             "LS_Sng026_Club_Num2_Env.uasset",
             "LS_Sng026_Club_Num3_Env.uasset",
             "LS_Sng026_Club_Num4_Env.uasset",
+
+            "LS_Sng026_Arena_Env.uasset",
+            "LS_Sng026_Arena_Num1_Env.uasset",
+            "LS_Sng026_Arena_Num2_Env.uasset",
+            "LS_Sng026_Arena_Num3_Env.uasset",
+            "LS_Sng026_Arena_Num4_Env.uasset",
+
+            "LS_Sng026_Night_Num4_Env.uasset",
+            "LS_Sng026_Dusk_Env.uasset",
+
+            "LS_Sng026_Stg201_Num4_Env.uasset",
+            "LS_Sng026_Stg201_Num3_Env.uasset",
+            "LS_Sng026_Stg201_Num2_Env.uasset",
+            "LS_Sng026_Stg201_Num1_Env.uasset",
+
+            "LS_Sng026_Stg201_Env.uasset",
+            "LS_Sng026_Stg111_Env.uasset",
+            "LS_Sng026_Stg104_Env.uasset",
+            "LS_Sng026_Stg102_Env.uasset",
+
+            "LS_Sng026_Dusk_Env.uasset",
+            "LS_Sng026_Night_Env.uasset",
+            "LS_Sng026_Night_Num1_Env.uasset",
+            "LS_Sng026_Night_Num2_Env.uasset",
+            "LS_Sng026_Night_Num3_Env.uasset",
+            "LS_Sng026_Night_Num4_Env.uasset",
+
+            "LS_Sng026_Stg302_Env.uasset",
+            "LS_Sng026_Stg301_Env.uasset",
+            "LS_Sng026_Stg204_Env.uasset",
+
+            "LS_Sng026_Stg315_Num4_Env.uasset",
+            "LS_Sng026_Stg315_Num3_Env.uasset",
+            "LS_Sng026_Stg315_Num2_Env.uasset",
+            "LS_Sng026_Stg315_Num1_Env.uasset",
+            "LS_Sng026_Stg315_Env.uasset",
+
         };
 
         public void parse(string source_folder, string target_folder, JObject json_obj)
@@ -78,6 +115,7 @@ namespace SSMod.CusPkg
 
                 if (LightColors.Contains(name))
                 {
+                    Console.WriteLine($"Is modifing :{name} .......{myAsset.FilePath}");
                     var curve_name_main = "LightColor";
                     var layer2_exports = parse_tool.get_scalar_layer2_exports(ref myAsset, layer1.Item1, layer1.Item2, curve_name_main);
                     foreach (var layer2_export in layer2_exports)
@@ -99,6 +137,7 @@ namespace SSMod.CusPkg
                 var name = layer1.Item1;
                 if (ToonGlobalSettings.Contains(name))
                 {
+                    Console.WriteLine($"Is modifing :{name} .......{myAsset.FilePath}");
                     var indivisual_ratio_curve = parse_tool.get_scalar_layer2_exports(ref myAsset, layer1.Item1, layer1.Item2, "individuallyRatio");
                     foreach (var layer2_export in indivisual_ratio_curve)
                     {
@@ -114,6 +153,7 @@ namespace SSMod.CusPkg
                     }
                 }
             }
+
 
         }
 

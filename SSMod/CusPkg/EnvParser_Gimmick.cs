@@ -41,23 +41,23 @@ namespace SSMod.CusPkg
             var layer1s = parse_tool.get_layer1_tracks(ref myAsset);
             Dictionary<string, string[]> edit_light_name_map = new Dictionary<string, string[]>()
             {
-                { "BP_GLGroup_LaserLightA", new string[]{ "laser_light", "1" }},
-                { "BP_GLGroup_LaserLightB", new string[]{ "laser_light", "2" }},
+                //{ "BP_GLGroup_LaserLightA", new string[]{ "laser_light", "1" }},
+                //{ "BP_GLGroup_LaserLightB", new string[]{ "laser_light", "2" }},
 
-                { "BP_GLGroup_LedFixA_A", new string[]{ "fix_light", "1" }},
-                { "BP_GLGroup_LedFixA_B", new string[]{ "fix_light", "2" }},
+                //{ "BP_GLGroup_LedFixA_A", new string[]{ "fix_light", "1" }},
+                //{ "BP_GLGroup_LedFixA_B", new string[]{ "fix_light", "2" }},
 
-                { "BP_GLGroup_LedLightA_A", new string[]{ "fix_light", "3" }},
-                { "BP_GLGroup_LedLightA_B", new string[]{ "fix_light", "4" }},
+                //{ "BP_GLGroup_LedLightA_A", new string[]{ "fix_light", "3" }},
+                //{ "BP_GLGroup_LedLightA_B", new string[]{ "fix_light", "4" }},
 
-                { "BP_GLGroup_SerchLightA_A", new string[]{ "serch_light", "1" }},
-                { "BP_GLGroup_SerchLightA_B", new string[]{ "serch_light", "2" }},
-                { "BP_GLGroup_SerchLightA_C", new string[]{ "serch_light", "3" }},
-                { "BP_GLGroup_SerchLightA_D", new string[]{ "serch_light", "2" }},
-                { "BP_GLGroup_SerchLightA_E", new string[]{ "serch_light", "3" }},
+                //{ "BP_GLGroup_SerchLightA_A", new string[]{ "serch_light", "1" }},
+                //{ "BP_GLGroup_SerchLightA_B", new string[]{ "serch_light", "2" }},
+                //{ "BP_GLGroup_SerchLightA_C", new string[]{ "serch_light", "3" }},
+                //{ "BP_GLGroup_SerchLightA_D", new string[]{ "serch_light", "2" }},
+                //{ "BP_GLGroup_SerchLightA_E", new string[]{ "serch_light", "3" }},
 
-                { "BP_GLGroup_SerchLightB_A", new string[]{ "serch_light", "4" }},
-                { "BP_GLGroup_SerchLightB_B", new string[]{ "serch_light", "4" }},
+                //{ "BP_GLGroup_SerchLightB_A", new string[]{ "serch_light", "4" }},
+                //{ "BP_GLGroup_SerchLightB_B", new string[]{ "serch_light", "4" }},
 
                 { "BP_GLGroup_SpotLightA_A", new string[]{ "spot_light", "1" }},
                 { "BP_GLGroup_SpotLightA_B", new string[]{ "spot_light", "2" }},
@@ -71,6 +71,7 @@ namespace SSMod.CusPkg
                 if (edit_light_name_map.Keys.Contains(name))
                 {
                     var names = edit_light_name_map[name];
+                    Console.WriteLine($"Is modifing :{names[0]} .......{myAsset.FilePath}");
                     var x = json_obj[names[0]];
                     var gimmik_colors = json_obj[names[0]][names[1]];
                     List<float> frames = new List<float>() { };
@@ -102,12 +103,12 @@ namespace SSMod.CusPkg
                     var layer2_exports = parse_tool.get_scalar_layer2_exports(ref myAsset, layer1.Item1, layer1.Item2, curve_name_main);
                     foreach (var layer2_export in layer2_exports)
                     {
-                        var red_curve = parse_tool.get_scalar_layer2_curve( layer2_export, "RedCurve");
-                        var green_curve = parse_tool.get_scalar_layer2_curve( layer2_export, "GreenCurve");
-                        var blue_curve = parse_tool.get_scalar_layer2_curve( layer2_export, "BlueCurve");
-                        var alpha_curve = parse_tool.get_scalar_layer2_curve( layer2_export, "AlphaCurve");
+                        var red_curve = parse_tool.get_scalar_layer2_curve(layer2_export, "RedCurve");
+                        var green_curve = parse_tool.get_scalar_layer2_curve(layer2_export, "GreenCurve");
+                        var blue_curve = parse_tool.get_scalar_layer2_curve(layer2_export, "BlueCurve");
+                        var alpha_curve = parse_tool.get_scalar_layer2_curve(layer2_export, "AlphaCurve");
 
-                        parse_tool.set_scalar_layer2_curve_float_values(ref myAsset, red_curve, frames, reds, is_fades.Count() == 0 ? null: is_fades) ;
+                        parse_tool.set_scalar_layer2_curve_float_values(ref myAsset, red_curve, frames, reds, is_fades.Count() == 0 ? null : is_fades);
                         parse_tool.set_scalar_layer2_curve_float_values(ref myAsset, green_curve, frames, greens, is_fades.Count() == 0 ? null : is_fades);
                         parse_tool.set_scalar_layer2_curve_float_values(ref myAsset, blue_curve, frames, blues, is_fades.Count() == 0 ? null : is_fades);
                         parse_tool.set_scalar_layer2_curve_float_values(ref myAsset, alpha_curve, alphas, alphas, is_fades.Count() == 0 ? null : is_fades);

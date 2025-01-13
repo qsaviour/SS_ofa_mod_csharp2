@@ -178,7 +178,7 @@ namespace SSMod.CusPkg
             return curve2;
         }
 
-        public void set_scalar_layer2_curve_float_values(ref UAsset myAsset,PropertyData curve_,List<float> frames,List<float> values,List<bool> is_fades,float off_value=0)
+        public void set_scalar_layer2_curve_float_values(ref UAsset myAsset,PropertyData curve_,List<float> frames,List<float> values,List<bool> is_fades)
         {
             var curve = (StructPropertyData)curve_;
             ArrayPropertyData times_curve = null;
@@ -191,6 +191,7 @@ namespace SSMod.CusPkg
             if(times_curve == null || values_curve == null)
             {
                 Console.WriteLine($"Write Curve Failed!");
+                return;
             }
             PropertyData[] frames_stack = new PropertyData[frames.Count];
             PropertyData[] values_stack = new PropertyData[values.Count];
@@ -209,7 +210,7 @@ namespace SSMod.CusPkg
                 value_stuct.StructType = new FName(myAsset, "MovieSceneFloatValue");
                 MovieSceneFloatValuePropertyData value_time = new MovieSceneFloatValuePropertyData(new FName(myAsset, "Values"));
                 value_time.Value = new FMovieSceneFloatValue();
-                value_time.Value.Value = values[i]+ off_value;
+                value_time.Value.Value = values[i];
 
                 value_time.Value.Tangent = new FMovieSceneTangentData();
                 if (is_fades!=null && is_fades[i])
